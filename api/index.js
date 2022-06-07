@@ -39,18 +39,19 @@ app.post("/api/refresh", (req, res) => {
         return res.status(403).json("Refresh token is not valid!");
     }
 
-    // remove used refresh token and create a new one
-    refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+    jwt.verify(refreshToken, "myRefreshSecretKey", (err, user) => {
+        err && console.log(err);
+        refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
 
-    const newAccessToken = generateAccessToken(user);
-    const newRefreshToken = generateRefreshToken(user);
+        const newAccessToken = generateAccessToken(user);
+        const newRefreshToken = generateRefreshToken(user);
 
-    refreshTokens.push(newRefreshToken);
+        refreshTokens.push(newRefreshToken);
 
-    //maybe send them in cookie
-    res.status(200).json({
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
+        res.status(200).json({
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
+        });
     });
 
 })
